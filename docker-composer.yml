@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  app:
+    # Build the image from the Dockerfile in the current directory
+    build: .
+    container_name: streamlit_app_container
+    # Always restart the container if it stops, unless we manually stop it.
+    # This is great for production!
+    restart: unless-stopped
+    ports:
+      # Map port 8501 on the server to port 8501 in the container
+      - "8501:8501"
+      
