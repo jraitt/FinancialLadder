@@ -153,7 +153,7 @@ def create_ladder_chart(allocation, bond_data, investment_amount):
     
     # Update layout
     fig.update_layout(
-        title='Bond Ladder Structure',
+        #title='Bond Ladder Structure',
         xaxis_title='Maturity (Years)',
         yaxis_title='Investment Amount ($)',
         barmode='group',

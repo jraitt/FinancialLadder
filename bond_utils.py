@@ -70,8 +70,8 @@ def get_bond_data():
             bond_data.loc[fund, 'Name'] = display_names[fund]
             bond_data.loc[fund, 'Maturity Range (years)'] = maturity_ranges[fund]
             bond_data.loc[fund, 'Credit Quality'] = credit_quality[fund]
-            bond_data.loc[fund, 'Current Price ($)'] = hist['Close'].iloc[-1] if not hist.empty else np.nan
-            bond_data.loc[fund, 'Yield (%)'] = yield_value
+            bond_data.loc[fund, 'Current Price ($)'] = round(hist['Close'].iloc[-1], 2) if not hist.empty else np.nan
+            bond_data.loc[fund, 'Yield (%)'] = round(yield_value, 2)
             
         return bond_data
     
@@ -101,8 +101,8 @@ def get_bond_data():
                 "VBIL": 4.0
             }
             
-            bond_data.loc[fund, 'Current Price ($)'] = fallback_prices[fund]
-            bond_data.loc[fund, 'Yield (%)'] = fallback_yields[fund]
+            bond_data.loc[fund, 'Current Price ($)'] = round(fallback_prices[fund], 2)
+            bond_data.loc[fund, 'Yield (%)'] = round(fallback_yields[fund], 2)
         
         return bond_data
 

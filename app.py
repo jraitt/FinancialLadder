@@ -7,17 +7,16 @@ from visualization import create_pie_chart, create_bar_chart, create_ladder_char
 
 # Set page configuration
 st.set_page_config(
-    page_title="Bond Ladder Planning Tool",
+    page_title="Bond Portfolio Planner",
     page_icon="📊",
     layout="wide"
 )
 
 # Application title and description
-st.title("Bond Ladder Planning Tool")
+st.title("Bond Portfolio Planner")
 st.markdown("""
-This tool helps you create a personalized bond ladder strategy based on your investment amount, 
-age, and other preferences. Bond laddering is a strategy that involves buying bonds with different 
-maturity dates to manage interest rate risk and provide liquidity at regular intervals.
+This tool helps you create a personalized portfolio allocation strategy based on your investment amount, 
+age, and other preferences.
 """)
 
 # Sidebar for inputs
@@ -30,7 +29,7 @@ investment_amount = st.sidebar.number_input(
     max_value=10000000,
     value=100000,
     step=1000,
-    help="Enter the total amount you want to invest in your bond ladder"
+    help="Enter the total amount you want to invest Bonds"
 )
 
 # Age adjustment option
@@ -49,7 +48,7 @@ if use_age_adjustment == "Yes":
         max_value=80,
         value=40,
         step=1,
-        help="Your current age will be used to adjust the bond ladder allocation"
+        help="Your current age will be used to adjust your bond allocation"
     )
 else:
     age = None
@@ -100,35 +99,49 @@ The allocation will be calculated using these bond funds:
 """)
 
 # Informational section - collapsible
-with st.expander("What is a Bond Ladder?"):
+with st.expander("Bond Quality and Maturity Explained."):
     st.markdown("""
-    ### Bond Ladder Concept
+    ### Bond Quality
     
-    A bond ladder is an investment strategy where you purchase bonds with staggered maturity dates. 
-    Instead of buying a single bond that matures in, say, 10 years, you might buy several bonds that 
-    mature in 2, 4, 6, 8, and 10 years.
+    Bond quality, often referred to as credit quality, indicates the likelihood that a bond issuer will 
+    default on its debt obligations. Bonds are typically rated by credit rating agencies (e.g., Moody's, 
+    Standard & Poor's) from highest (e.g., AAA) to lowest (e.g., D).
     
-    ### Key Benefits
+    -   **Investment Grade Bonds**: These are bonds issued by financially stable entities with a low 
+        risk of default. They typically offer lower yields but are considered safer.
+    -   **High-Yield (Junk) Bonds**: These are bonds issued by companies or governments with a higher 
+        risk of default. They offer higher yields to compensate investors for the increased risk.
     
-    1. **Reduced Interest Rate Risk**: By spreading investments across different maturities, you reduce 
-       the impact of interest rate fluctuations.
+    ### Bond Maturity and Interest Rate Sensitivity
     
-    2. **Liquidity Management**: As bonds mature at regular intervals, you have the flexibility to 
-       either reinvest or use the proceeds.
+    **Maturity** refers to the length of time until the bond's principal is repaid to the investor. 
+    Bonds can have short-term (e.g., less than 3 years), intermediate-term (e.g., 3-10 years), or 
+    long-term (e.g., over 10 years) maturities.
     
-    3. **Income Stability**: The ladder provides a consistent stream of income as different bonds mature.
+    **Interest Rate Sensitivity** (or duration) describes how much a bond's price is likely to change 
+    when interest rates move.
     
-    4. **Diversification**: Using different types of bond funds adds another layer of diversification.
+    -   **Inverse Relationship**: Bond prices and interest rates generally move in opposite directions. 
+        When interest rates rise, existing bond prices fall (and vice-versa).
+    -   **Longer Maturity = Higher Sensitivity**: Bonds with longer maturities are more sensitive to 
+        changes in interest rates. A small change in interest rates will have a larger impact on the 
+        price of a long-term bond than on a short-term bond.
     
-    ### How This Tool Works
+    ### Bonds vs. Stocks: Historical Relationship
     
-    This tool helps you allocate your investment across various bond funds with different maturity ranges 
-    to create an effective bond ladder. If you choose age adjustment, the allocation will be tailored to 
-    be more conservative as your age increases.
+    Historically, bonds and stocks have often exhibited a low or negative correlation, meaning they tend 
+    to move in different directions or have less synchronized movements.
+    
+    -   **Diversification**: This low correlation makes bonds a valuable diversification tool in a 
+        portfolio. When stocks perform poorly, bonds may hold their value or even increase, providing 
+        a cushion against overall portfolio losses.
+    -   **Risk and Return**: Stocks generally offer higher potential returns over the long term but come 
+        with higher volatility and risk. Bonds typically offer lower, more stable returns with less 
+        volatility, making them suitable for capital preservation and income generation.
     """)
 
 # Main content
-st.header("Your Bond Ladder Strategy")
+st.header("Your Selected Bond Strategy")
 
 # Fetch bond data
 with st.spinner("Fetching latest bond fund data..."):
@@ -137,7 +150,11 @@ with st.spinner("Fetching latest bond fund data..."):
         
         # Display bond data in table
         st.subheader("Current Bond Fund Information")
-        st.dataframe(bond_data)
+        # Format 'Current Price ($)' and 'Yield (%)' columns to two decimal places for display
+        bond_data_display = bond_data.copy()
+        bond_data_display['Current Price ($)'] = bond_data_display['Current Price ($)'].apply(lambda x: f"{x:.2f}" if pd.notna(x) else "N/A")
+        bond_data_display['Yield (%)'] = bond_data_display['Yield (%)'].apply(lambda x: f"{x:.2f}" if pd.notna(x) else "N/A")
+        st.dataframe(bond_data_display)
         
         # Calculate bond ladder allocation
         allocation = calculate_bond_ladder(
@@ -177,7 +194,7 @@ with st.spinner("Fetching latest bond fund data..."):
         st.dataframe(allocation_table)
         
         # Display ladder visualization
-        st.subheader("Bond Ladder Visualization")
+        st.subheader("Amount Vs. Maturity")
         fig_ladder = create_ladder_chart(allocation, bond_data, investment_amount)
         st.plotly_chart(fig_ladder, use_container_width=True)
         
