@@ -1,14 +1,20 @@
+# FILE: docker-compose.yml (Enhanced Version)
+
 version: '3.8'
 
 services:
   app:
-    # Build the image from the Dockerfile in the current directory
     build: .
     container_name: streamlit_app_container
-    # Always restart the container if it stops, unless we manually stop it.
-    # This is great for production!
     restart: unless-stopped
     ports:
-      # Map port 8501 on the server to port 8501 in the container
-      - "8501:8501"
-      
+      # Bind to localhost ONLY
+      - "127.0.0.1:8501:8501"
+    
+    # RECOMMENDED: Add a healthcheck
+    healthcheck:
+      # Streamlit has a built-in health endpoint
+      test: ["CMD", "curl", "-f", "http://localhost:8501/_stcore/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
