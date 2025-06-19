@@ -7,13 +7,13 @@ from visualization import create_pie_chart, create_bar_chart, create_ladder_char
 
 # Set page configuration
 st.set_page_config(
-    page_title="Bond Portfolio Planner JR",
+    page_title="Bond Portfolio Planner",
     page_icon="📊",
     layout="wide"
 )
 
 # Application title and description
-st.title("Bond Portfolio Planner")
+st.title("Bond Portfolio Planner JR")
 st.markdown("""
 This tool helps you create a personalized portfolio allocation strategy based on your investment amount, 
 age, and other preferences.
