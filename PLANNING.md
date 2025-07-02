@@ -5,7 +5,7 @@ This document outlines the architectural decisions, coding standards, and overal
 ## 1. Project Goals
 
 -   To provide a user-friendly Streamlit application for bond portfolio allocation.
--   To offer personalized bond ladder strategies based on user inputs (age, investment amount, risk tolerance, etc.).
+-   To allow users to manually allocate bond percentages by symbol.
 -   To visualize bond allocations and expected returns clearly.
 -   To ensure maintainability, scalability, and testability of the codebase.
 
@@ -14,7 +14,7 @@ This document outlines the architectural decisions, coding standards, and overal
 The application follows a modular architecture, separating concerns into distinct Python files:
 
 -   `app.py`: Handles the Streamlit UI, user input, and orchestration of other modules.
--   `bond_utils.py`: Contains core business logic related to fetching bond data, calculating allocations, and age-based recommendations.
+-   `bond_utils.py`: Contains core business logic related to fetching bond data and other bond-related utilities.
 -   `visualization.py`: Responsible for generating all charts and visualizations using Plotly.
 
 ## 3. Coding Standards and Conventions

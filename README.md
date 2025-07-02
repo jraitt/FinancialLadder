@@ -1,14 +1,14 @@
 # BondPlanner
 
-This project provides a Streamlit application to help users create a personalized bond portfolio allocation strategy. It allows users to input investment parameters such as amount, age, investment horizon, and risk tolerance, and then visualizes the recommended bond ladder strategy.
+This project provides a Streamlit application to help users create a personalized bond portfolio allocation strategy. It allows users to manually input bond allocation percentages by symbol and visualizes the resulting bond portfolio.
 
 ## Features
 
-- **Personalized Allocation**: Adjusts bond allocation based on user's age and risk tolerance.
+- **Manual Allocation**: Users can directly input percentage allocations for each bond symbol.
+- **Allocation Validation**: Alerts the user if the total bond allocation does not sum to 100%.
 - **Bond Fund Data**: Fetches and displays current information for various Vanguard bond ETFs and funds.
-- **Interactive Visualizations**: Presents allocation data through pie charts, bar charts, and a bond ladder visualization.
-- **International Diversification**: Option to include international bonds (BNDX) for broader diversification.
-- **Expected Returns**: Estimates annual yield and income based on the calculated allocation.
+- **Interactive Visualizations**: Presents allocation data through pie charts, bar charts, and a bond ladder visualization, excluding bond types with 0% allocation.
+- **Expected Returns**: Estimates annual yield and income based on the specified allocation.
 
 ## Setup and Installation
 
@@ -30,7 +30,7 @@ To run this application locally, follow these steps:
     ```bash
     pip install -r requirements.txt
     ```
-    *(Note: You may need to create a `requirements.txt` file if it doesn't exist, listing `streamlit`, `pandas`, `numpy`, `yfinance`, `plotly`, `SQLAlchemy`, `SQLModel`, `pydantic`, `black`, `pytest`, `fastapi`)*
+    *(Note: You may need to create a `requirements.txt` file if it doesn't exist, listing `streamlit`, `pandas`, `numpy`, `yfinance`, `plotly`)*
 
 4.  **Run the Streamlit application**:
     ```bash
@@ -42,7 +42,7 @@ The application will open in your default web browser.
 ## Project Structure
 
 -   `app.py`: Main Streamlit application file.
--   `bond_utils.py`: Contains functions for fetching bond data and calculating bond ladder allocations.
+-   `bond_utils.py`: Contains functions for fetching bond data and other bond-related utilities.
 -   `visualization.py`: Contains functions for creating various charts and visualizations.
 -   `README.md`: Project overview and setup instructions.
 -   `PLANNING.md`: Project architecture, goals, style, and constraints.
@@ -50,11 +50,13 @@ The application will open in your default web browser.
 
 ## Usage
 
-1.  Adjust the investment parameters in the sidebar.
-2.  View the "Current Bond Fund Information" table.
-3.  Analyze the "Bond Allocation" and "Allocation by Maturity" charts.
-4.  Review the "Detailed Allocation" table and "Bond Ladder Visualization".
-5.  Check the "Expected Returns and Considerations" section for estimated income.
+1.  Enter the total investment amount in the sidebar.
+2.  Manually adjust the percentage allocation for each bond symbol in the sidebar.
+3.  Ensure the total allocation sums to 100% (an alert will be displayed otherwise).
+4.  View the "Current Bond Fund Information" table.
+5.  Analyze the "Bond Allocation" and "Allocation by Maturity" charts.
+6.  Review the "Detailed Allocation" table and "Amount Vs. Maturity" visualization.
+7.  Check the "Expected Returns and Considerations" section for estimated income.
 
 ## Contributing
 

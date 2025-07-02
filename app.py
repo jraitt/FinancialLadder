@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import yfinance as yf
-from bond_utils import calculate_bond_ladder, get_bond_data, get_age_adjusted_allocation
+from bond_utils import get_bond_data
 from visualization import create_pie_chart, create_bar_chart, create_ladder_chart
 
 # Set page configuration
@@ -13,10 +13,10 @@ st.set_page_config(
 )
 
 # Application title and description
-st.title("Bond Portfolio Planner JR")
+st.title("Bond Portfolio Planner")
 st.markdown("""
 This tool helps you create a personalized portfolio allocation strategy based on your investment amount, 
-age, and other preferences.
+and manual allocation for each bond type.
 """)
 
 # Sidebar for inputs
@@ -27,64 +27,43 @@ investment_amount = st.sidebar.number_input(
     "Amount to Invest ($)",
     min_value=1000,
     max_value=10000000,
-    value=100000,
+    value=1000000,
     step=1000,
-    help="Enter the total amount you want to invest Bonds"
+    help="Enter the total amount you want to invest in Bonds"
 )
 
-# Age adjustment option
-use_age_adjustment = st.sidebar.radio(
-    "Adjust for Age?",
-    ["Yes", "No"],
-    index=0,
-    help="If selected, the bond allocation will be adjusted based on your age"
-)
+# Bond allocation inputs
+st.sidebar.subheader("Bond Allocation (%)")
+bond_symbols = ["BND", "BNDX", "VFIDX", "VFSUX", "VGUS", "VBIL"]
+allocations_pct = {}
 
-# If age adjustment is selected, show age input
-if use_age_adjustment == "Yes":
-    age = st.sidebar.slider(
-        "Your Age",
-        min_value=20,
-        max_value=80,
-        value=40,
-        step=1,
-        help="Your current age will be used to adjust your bond allocation"
+# Set default values that sum to 100
+default_allocations = {
+    "BND": 35.0,
+    "BNDX": 30.0,
+    "VFIDX": 20.0,
+    "VFSUX": 15.0,
+    "VGUS": 0.0,
+    "VBIL": 0.0
+}
+
+for symbol in bond_symbols:
+    allocations_pct[symbol] = st.sidebar.number_input(
+        f"{symbol} Allocation (%)",
+        min_value=0.0,
+        max_value=100.0,
+        value=default_allocations.get(symbol, 0.0),
+        step=1.0,
+        key=f"alloc_{symbol}"
     )
+
+# Check if total allocation is 100%
+total_allocation = sum(allocations_pct.values())
+if abs(total_allocation - 100.0) > 0.01:  # Use a small tolerance for float comparison
+    st.sidebar.warning(f"Total allocation is {total_allocation:.2f}%. It must equal 100%.")
 else:
-    age = None
+    st.sidebar.success("Total allocation is 100%.")
 
-# Additional parameters
-st.sidebar.subheader("Additional Parameters")
-
-investment_horizon = st.sidebar.slider(
-    "Investment Horizon (years)",
-    min_value=1,
-    max_value=30,
-    value=10,
-    step=1,
-    help="How long you plan to hold your bond investments"
-)
-
-risk_tolerance = st.sidebar.select_slider(
-    "Risk Tolerance",
-    options=["Very Conservative", "Conservative", "Moderate", "Aggressive", "Very Aggressive"],
-    value="Moderate",
-    help="Your comfort level with investment risk"
-)
-
-# International bond option
-st.sidebar.subheader("International Diversification")
-include_international = st.sidebar.radio(
-    "Include International Bonds?",
-    ["Yes", "No"],
-    index=0,
-    help="Select 'Yes' to include Vanguard Total International Bond ETF (BNDX) in your allocation"
-)
-
-if include_international == "Yes":
-    st.sidebar.info("Including international bonds (BNDX) provides geographic diversification and can reduce overall portfolio volatility.")
-else:
-    st.sidebar.info("Excluding international bonds will redistribute that allocation to domestic bond funds.")
 
 # Bond fund selection
 st.sidebar.subheader("Bond Funds")
@@ -141,7 +120,6 @@ with st.expander("Bond Quality and Maturity Explained."):
     """)
 
 # Main content
-st.header("Your Selected Bond Strategy")
 
 # Fetch bond data
 with st.spinner("Fetching latest bond fund data..."):
@@ -156,80 +134,62 @@ with st.spinner("Fetching latest bond fund data..."):
         bond_data_display['Yield (%)'] = bond_data_display['Yield (%)'].apply(lambda x: f"{x:.2f}" if pd.notna(x) else "N/A")
         st.dataframe(bond_data_display)
         
-        # Calculate bond ladder allocation
-        allocation = calculate_bond_ladder(
-            investment_amount=investment_amount,
-            age=age,
-            investment_horizon=investment_horizon,
-            risk_tolerance=risk_tolerance,
-            bond_data=bond_data,
-            include_international=(include_international == "Yes")
-        )
-        
-        # Display results in columns
-        col1, col2 = st.columns(2)
-        
-        with col1:
-            st.subheader("Bond Allocation")
-            # Display pie chart of allocation
-            fig_pie = create_pie_chart(allocation)
-            st.plotly_chart(fig_pie, use_container_width=True)
-        
-        with col2:
-            st.subheader("Allocation by Maturity")
-            # Display bar chart by maturity
-            fig_bar = create_bar_chart(allocation, bond_data)
-            st.plotly_chart(fig_bar, use_container_width=True)
-        
-        # Display allocation table
-        st.subheader("Detailed Allocation")
-        
-        # Create allocation table
-        allocation_table = pd.DataFrame({
-            "Fund": allocation.keys(),
-            "Allocation (%)": [round(val * 100, 2) for val in allocation.values()],
-            "Amount ($)": [round(val * investment_amount, 2) for val in allocation.values()]
-        })
-        
-        st.dataframe(allocation_table)
-        
-        # Display ladder visualization
-        st.subheader("Amount Vs. Maturity")
-        fig_ladder = create_ladder_chart(allocation, bond_data, investment_amount)
-        st.plotly_chart(fig_ladder, use_container_width=True)
-        
-        # Age-based recommendation section
-        if age is not None:
-            st.subheader("Age-Based Recommendation")
-            age_recommendation = get_age_adjusted_allocation(age)
+        # Create allocation dictionary from user inputs
+        allocation = {symbol: pct / 100.0 for symbol, pct in allocations_pct.items()}
+
+        # Display results only if the allocation is 100%
+        if abs(total_allocation - 100.0) < 0.01:
+            # Display results in columns
+            col1, col2 = st.columns(2)
+            
+            with col1:
+                st.subheader("Bond Allocation")
+                # Display pie chart of allocation
+                fig_pie = create_pie_chart(allocation)
+                st.plotly_chart(fig_pie, use_container_width=True)
+            
+            with col2:
+                st.subheader("Allocation by Maturity")
+                # Display bar chart by maturity
+                fig_bar = create_bar_chart(allocation, bond_data)
+                st.plotly_chart(fig_bar, use_container_width=True)
+            
+            # Display allocation table
+            st.subheader("Detailed Allocation")
+            
+            # Create allocation table
+            allocation_table = pd.DataFrame({
+                "Fund": allocation.keys(),
+                "Allocation (%)": [round(val * 100, 2) for val in allocation.values()],
+                "Amount ($)": [round(val * investment_amount, 2) for val in allocation.values()]
+            })
+            
+            st.dataframe(allocation_table)
+            
+            # Display ladder visualization
+            st.subheader("Amount Vs. Maturity")
+            fig_ladder = create_ladder_chart(allocation, bond_data, investment_amount)
+            st.plotly_chart(fig_ladder, use_container_width=True)
+            
+            # Expected returns section
+            st.subheader("Expected Returns and Considerations")
+            
+            # Calculate weighted average yield
+            weighted_yield = sum(allocation[fund] * bond_data.loc[fund, 'Yield (%)'] for fund in allocation if allocation[fund] > 0 and fund in bond_data.index)
             
             st.markdown(f"""
-            Based on your age ({age}), we recommend:
+            - **Estimated Annual Yield**: {weighted_yield:.2f}%
+            - **Estimated Annual Income**: ${(weighted_yield/100 * investment_amount):.2f}
             
-            - **Short-term bonds**: {age_recommendation['short']}%
-            - **Intermediate-term bonds**: {age_recommendation['intermediate']}%
-            - **Long-term bonds**: {age_recommendation['long']}%
+            **Important Considerations**:
             
-            Your current allocation is aligned with this recommendation.
+            - Bond prices move inversely to interest rates
+            - Longer-term bonds generally offer higher yields but with increased interest rate risk
+            - Diversification across different bond types helps manage overall portfolio risk
+            - Review and rebalance your bond ladder periodically, especially as bonds mature
             """)
-            
-        # Expected returns section
-        st.subheader("Expected Returns and Considerations")
-        
-        # Calculate weighted average yield
-        weighted_yield = sum(allocation[fund] * bond_data.loc[fund, 'Yield (%)'] for fund in allocation)
-        
-        st.markdown(f"""
-        - **Estimated Annual Yield**: {weighted_yield:.2f}%
-        - **Estimated Annual Income**: ${(weighted_yield/100 * investment_amount):.2f}
-        
-        **Important Considerations**:
-        
-        - Bond prices move inversely to interest rates
-        - Longer-term bonds generally offer higher yields but with increased interest rate risk
-        - Diversification across different bond types helps manage overall portfolio risk
-        - Review and rebalance your bond ladder periodically, especially as bonds mature
-        """)
+        else:
+            st.error("Total allocation must be 100% to calculate and display the portfolio.")
         
     except Exception as e:
         st.error(f"Error processing bond data: {str(e)}")

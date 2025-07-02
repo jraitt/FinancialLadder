@@ -7,8 +7,11 @@ def create_pie_chart(allocation):
     """
     Create a pie chart visualization of the bond allocation
     """
-    labels = list(allocation.keys())
-    values = [val * 100 for val in allocation.values()]  # Convert to percentages
+    # Filter out funds with 0 allocation
+    filtered_allocation = {k: v for k, v in allocation.items() if v > 0}
+
+    labels = list(filtered_allocation.keys())
+    values = [val * 100 for val in filtered_allocation.values()]  # Convert to percentages
     
     # Create readable labels with percentages
     labels_with_pct = [f"{label} ({val:.1f}%)" for label, val in zip(labels, values)]
@@ -44,10 +47,13 @@ def create_bar_chart(allocation, bond_data):
     """
     Create a bar chart showing allocation by maturity
     """
+    # Filter out funds with 0 allocation
+    filtered_allocation = {k: v for k, v in allocation.items() if v > 0}
+
     # Extract maturity ranges and convert to numeric for sorting
     maturity_data = {}
     
-    for fund, alloc in allocation.items():
+    for fund, alloc in filtered_allocation.items():
         maturity_range = bond_data.loc[fund, 'Maturity Range (years)']
         # Take the midpoint of the range for sorting
         maturity_parts = maturity_range.split('-')
@@ -90,8 +96,11 @@ def create_ladder_chart(allocation, bond_data, investment_amount):
     """
     Create a visualization of the bond ladder structure
     """
+    # Filter out funds with 0 allocation
+    filtered_allocation = {k: v for k, v in allocation.items() if v > 0}
+
     # Prepare data for the chart
-    funds = list(allocation.keys())
+    funds = list(filtered_allocation.keys())
     maturities = []
     for fund in funds:
         maturity_range = bond_data.loc[fund, 'Maturity Range (years)']
@@ -102,7 +111,7 @@ def create_ladder_chart(allocation, bond_data, investment_amount):
             midpoint = float(maturity_parts[0])
         maturities.append(midpoint)
     
-    amounts = [allocation[fund] * investment_amount for fund in funds]
+    amounts = [filtered_allocation[fund] * investment_amount for fund in funds]
     yields = [bond_data.loc[fund, 'Yield (%)'] for fund in funds]
     
     # Calculate expected income
@@ -138,18 +147,18 @@ def create_ladder_chart(allocation, bond_data, investment_amount):
         ))
     
     # Add a line connecting the bars to visualize the ladder
-    maturity_points = ladder_df['Maturity'].tolist()
-    amount_points = ladder_df['Amount'].tolist()
+    # maturity_points = ladder_df['Maturity'].tolist()
+    # amount_points = ladder_df['Amount'].tolist()
     
-    fig.add_trace(go.Scatter(
-        x=maturity_points,
-        y=amount_points,
-        mode='lines+markers',
-        line=dict(color='rgba(0,0,0,0.5)', width=2, dash='dash'),
-        marker=dict(size=10, symbol='circle', color='rgba(0,0,0,0.8)'),
-        name='Ladder Structure',
-        hoverinfo='skip'
-    ))
+    # fig.add_trace(go.Scatter(
+    #     x=maturity_points,
+    #     y=amount_points,
+    #     mode='lines+markers',
+    #     line=dict(color='rgba(0,0,0,0.5)', width=2, dash='dash'),
+    #     marker=dict(size=10, symbol='circle', color='rgba(0,0,0,0.8)'),
+    #     name='Ladder Structure',
+    #     hoverinfo='skip'
+    # ))
     
     # Update layout
     fig.update_layout(
