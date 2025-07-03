@@ -34,7 +34,7 @@ investment_amount = st.sidebar.number_input(
 
 # Bond allocation inputs
 st.sidebar.subheader("Bond Allocation (%)")
-bond_symbols = ["BND", "BNDX", "VFIDX", "VFSUX", "VGUS", "VBIL"]
+bond_symbols = ["BND", "BNDX", "VCORX", "VFIDX", "VFSUX", "VGUS", "VBIL"]
 allocations_pct = {}
 
 # Set default values that sum to 100
@@ -44,7 +44,8 @@ default_allocations = {
     "VFIDX": 20.0,
     "VFSUX": 15.0,
     "VGUS": 0.0,
-    "VBIL": 0.0
+    "VBIL": 0.0,
+    "VCORX": 0.0
 }
 
 for symbol in bond_symbols:
@@ -71,6 +72,7 @@ st.sidebar.markdown("""
 The allocation will be calculated using these bond funds:
 - **BND**: Vanguard Total Bond Market ETF
 - **BNDX**: Vanguard Total International Bond ETF
+- **VCORX**: Vanguard Core Bond Fund Investor Shares
 - **VFIDX**: Vanguard Intermediate-Term Investment-Grade Fund
 - **VFSUX**: Vanguard Short-Term Investment-Grade Fund
 - **VGUS**: Vanguard Ultra-Short Treasury ETF (1-12 months)

@@ -7,7 +7,7 @@ def get_bond_data():
     Fetch current data for the bond funds used in the ladder
     """
     # List of bond funds
-    bond_funds = ["BND", "BNDX", "VFIDX", "VFSUX", "VGUS", "VBIL"]
+    bond_funds = ["BND", "BNDX", "VCORX", "VFIDX", "VFSUX", "VGUS", "VBIL"]
     
     # Map display names
     display_names = {
@@ -16,7 +16,8 @@ def get_bond_data():
         "VFIDX": "Vanguard Intermediate-Term Investment-Grade Fund",
         "VFSUX": "Vanguard Short-Term Investment-Grade Fund",
         "VGUS": "Vanguard Ultra-Short Treasury ETF",  # 1-12 months maturity
-        "VBIL": "Vanguard Ultra-Short Treasury Bills ETF"  # 0-3 months maturity
+        "VBIL": "Vanguard Ultra-Short Treasury Bills ETF",  # 0-3 months maturity
+        "VCORX": "Vanguard Core Bond Fund Investor Shares"
     }
     
     # Map maturity ranges (in years)
@@ -26,7 +27,8 @@ def get_bond_data():
         "VFIDX": "5-6",
         "VFSUX": "2-3",
         "VGUS": "0-1",  # Ultra-short-term Treasury (1-12 months)
-        "VBIL": "0-0.25"  # Ultra-short Treasury Bills (0-3 months)
+        "VBIL": "0-0.25",  # Ultra-short Treasury Bills (0-3 months)
+        "VCORX": "8-10"
     }
     
     # Map credit quality
@@ -36,7 +38,8 @@ def get_bond_data():
         "VFIDX": "Investment Grade",
         "VFSUX": "Investment Grade",
         "VGUS": "U.S. Treasury",  # Highest quality
-        "VBIL": "U.S. Treasury Bills"  # Highest quality, shortest term
+        "VBIL": "U.S. Treasury Bills",  # Highest quality, shortest term
+        "VCORX": "Mixed Investment Grade"
     }
     
     # Create DataFrame
@@ -62,7 +65,8 @@ def get_bond_data():
                     "VFIDX": 4.8,
                     "VFSUX": 4.5,
                     "VGUS": 4.3,
-                    "VBIL": 4.0
+                    "VBIL": 4.0,
+                    "VCORX": 4.62
                 }
                 yield_value = fallback_yields[fund]
             
@@ -89,7 +93,8 @@ def get_bond_data():
                 "VFIDX": 9.40,
                 "VFSUX": 9.60,
                 "VGUS": 60.25,
-                "VBIL": 50.80
+                "VBIL": 50.80,
+                "VCORX": 9.01
             }
             
             fallback_yields = {
@@ -98,7 +103,8 @@ def get_bond_data():
                 "VFIDX": 4.8,
                 "VFSUX": 4.5,
                 "VGUS": 4.3,
-                "VBIL": 4.0
+                "VBIL": 4.0,
+                "VCORX": 4.62
             }
             
             bond_data.loc[fund, 'Current Price ($)'] = round(fallback_prices[fund], 2)
