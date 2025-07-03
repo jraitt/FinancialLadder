@@ -8,6 +8,7 @@ This document tracks the development tasks for the BondPlanner application.
 
 ## Completed Tasks
 
+-   **2025-07-03**: Add Expense Ratio to the fund information table.
 -   **2025-07-03**: Add VCORX as another bond fund.
 -   **2025-07-01**: Removed existing user inputs and replaced with allocation allotment for each bond type by symbol. Added alert if total portfolio allotment does not equal 100%.
 -   **2025-07-01**: Removed `calculate_bond_ladder` and `get_age_adjusted_allocation` functions from `bond_utils.py`.

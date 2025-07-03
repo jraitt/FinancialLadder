@@ -69,12 +69,28 @@ def get_bond_data():
                     "VCORX": 4.62
                 }
                 yield_value = fallback_yields[fund]
+
+            # Get expense ratio
+            if 'netExpenseRatio' in info and info['netExpenseRatio'] is not None:
+                er_value = info['netExpenseRatio']
+            else:
+                fallback_er = {
+                    "BND": 0.03,
+                    "BNDX": 0.07,
+                    "VCORX": 0.20,
+                    "VFIDX": 0.10,
+                    "VFSUX": 0.10,
+                    "VGUS": 0.07,
+                    "VBIL": 0.07
+                }
+                er_value = fallback_er[fund]
             
             # Add to DataFrame
             bond_data.loc[fund, 'Name'] = display_names[fund]
             bond_data.loc[fund, 'Maturity Range (years)'] = maturity_ranges[fund]
             bond_data.loc[fund, 'Credit Quality'] = credit_quality[fund]
             bond_data.loc[fund, 'Current Price ($)'] = round(hist['Close'].iloc[-1], 2) if not hist.empty else np.nan
+            bond_data.loc[fund, 'Expense Ratio (%)'] = round(er_value, 2)
             bond_data.loc[fund, 'Yield (%)'] = round(yield_value, 2)
             
         return bond_data
@@ -106,8 +122,19 @@ def get_bond_data():
                 "VBIL": 4.0,
                 "VCORX": 4.62
             }
+
+            fallback_er = {
+                "BND": 0.03,
+                "BNDX": 0.07,
+                "VCORX": 0.20,
+                "VFIDX": 0.10,
+                "VFSUX": 0.10,
+                "VGUS": 0.07,
+                "VBIL": 0.07
+            }
             
             bond_data.loc[fund, 'Current Price ($)'] = round(fallback_prices[fund], 2)
+            bond_data.loc[fund, 'Expense Ratio (%)'] = round(fallback_er[fund], 2)
             bond_data.loc[fund, 'Yield (%)'] = round(fallback_yields[fund], 2)
         
         return bond_data

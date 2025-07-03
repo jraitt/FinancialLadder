@@ -133,6 +133,7 @@ with st.spinner("Fetching latest bond fund data..."):
         # Format 'Current Price ($)' and 'Yield (%)' columns to two decimal places for display
         bond_data_display = bond_data.copy()
         bond_data_display['Current Price ($)'] = bond_data_display['Current Price ($)'].apply(lambda x: f"{x:.2f}" if pd.notna(x) else "N/A")
+        bond_data_display['Expense Ratio (%)'] = bond_data_display['Expense Ratio (%)'].apply(lambda x: f"{x:.2f}" if pd.notna(x) else "N/A")
         bond_data_display['Yield (%)'] = bond_data_display['Yield (%)'].apply(lambda x: f"{x:.2f}" if pd.notna(x) else "N/A")
         st.dataframe(bond_data_display)
         
